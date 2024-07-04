@@ -1,20 +1,34 @@
-export function App () {
+import './App.css'
+import { TwitterFollowCrad } from './TwitterFollowCard'
 
+const users = [
+    {
+      userName: 'midudev',
+      name: 'Miguel Ángel Durán',
+      isFollowing: true
+    },
+    {
+      userName: 'PacoHdezs',
+      name: 'Paco Hdez',
+      isFollowing: true
+    },
+    {
+      userName: 'TMChein',
+      name: 'Tomas',
+      isFollowing: false
+    }
+  ]
+
+  export function App () {
+    const formatUserName = (userName) => `@${userName}`
     return(
-        <article style={{display: 'flex', alignItems: 'center', color: '#fff'}}>
-            <header>
-                <img alt="El avatar" src="https://unavatar.io/banner.png"/>
-                <div>
-                    <strong>Rafa</strong>
-                    <span>@rafa</span>
-                </div>
-            </header>
-            <aside>
-                <button>
-                    Seguir
-                </button>
-            </aside>
-        </article>
+        <section className='App'>
+            {
+                users.map(({ userName, name, isFollowing }) => (
+                    <TwitterFollowCrad formatUserName={formatUserName} initialIsFollowing={isFollowing} key={userName} userName={userName} >{name}</TwitterFollowCrad>
+                  ))
+            }
+        </section>
     )
 
 }
