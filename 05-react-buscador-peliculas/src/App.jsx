@@ -1,7 +1,10 @@
+/* eslint-disable react/react-in-jsx-scope */
 import './App.css'
+
 import { Movies } from './components/Movies'
 import { useMovies } from './hooks/useMovies'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef,useCallback } from 'react'
+import debounce from 'just-debounce-it'
 
 
 function useSearch () {
@@ -37,19 +40,32 @@ function useSearch () {
 }
 
 function App() {
-
+  const [sort, setSort] = useState(false)
   const { search, updateSearch, error } = useSearch()
-  const {movies, getMovies} = useMovies({search})
+  const {movies, getMovies, loading} = useMovies({search, sort})
 
+  const debouncedGetMovies = useCallback(
+    debounce(search => {
+      console.log('search', search)
+      getMovies({ search })
+    }, 300)
+    , [getMovies]
+  )
 
   
   const handleChange = (event) => {
-    updateSearch(event.target.value)
+    const newSearch = event.target.value
+    updateSearch(newSearch)
+    debouncedGetMovies(newSearch)
   }
 
-  const handleSubmit= (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault()
-    getMovies()
+    getMovies({search})
+  }
+
+  const handleSort = () => {
+    setSort(!sort)
   }
 
   return (
@@ -62,13 +78,17 @@ function App() {
               border: '1px solid transparent',
               borderColor: error ? 'red' : 'transparent'
             }} onChange={handleChange} value={search} name='query' placeholder='Avengers, Star Wars, The Matrix...'
-          />          <button type='submit'>Buscar</button>
+          />     
+          <input type="checkbox" onChange={handleSort} checked={sort}/>     
+          <button type='submit'>Buscar</button>
         </form>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </header>
 
       <main>
-        <Movies movies={movies}/>
+      {
+        loading ? <p>Cargando...</p> : <Movies movies={movies} />
+      }
       </main>
 
     </div>
